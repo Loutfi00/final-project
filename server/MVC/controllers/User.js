@@ -25,8 +25,8 @@ const getRegister = (req, res) => {
 };
 
 const generateAccessToken = (user) => {
-  return jwt.sign({ id: user._id, username: user.username }, JWT_SECRET, {
-    expiresIn: "15s",
+  return jwt.sign({ id: user.id, username: user.username }, JWT_SECRET, {
+    expiresIn: "6000s",
   });
 };
 
@@ -35,6 +35,7 @@ const postLogin = async (req, res) => {
   const user = await User.findOne({ username }).lean();
   console.log("username : " + username);
   console.log(user);
+
   if (!user) {
     return res.json({
       status: 200,
@@ -49,6 +50,7 @@ const postLogin = async (req, res) => {
       username: user.username,
     };
     const token = generateAccessToken(userObj);
+
     const refreshToken = jwt.sign(userObj, JWT_REFRESH_SECRET);
     await User.updateOne(
       { _id: user._id },
@@ -74,7 +76,7 @@ const postRegister = async (req, res) => {
   const { username, password, email, confirmPassword } = req.body;
 
   console.log(username);
-  // console.log(req.body);
+  console.log(req.body);
   try {
     if (!username || typeof username !== "string") {
       return res.json({ status: 200, error: "Invalid username", errCode: 2 });
@@ -148,10 +150,11 @@ const getToken = async (req, res) => {
       };
       res.status(200).json({ status: 200, profile: profile });
     } catch (err) {
+      res.sendStatus(403);
       // const user = jwt.verify(token, JWT_SECRET);
-      res.status(200).json({ status: 200, profile: refreshToken });
+      // res.status(200).json({ status: 200, profile: refreshToken });
 
-      // const { token } = req.params;
+      // const { token } = req.paras;
       //
       // const _id = user.id;
       // const findUser = await User.findOne(_id).lean();
