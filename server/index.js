@@ -18,7 +18,11 @@ const {
   deleteToken,
 } = require("./MVC/controllers/User");
 
-const { postInventory, addCards } = require("./MVC/controllers/Inventory");
+const {
+  postInventory,
+  addCards,
+  exchangeCard,
+} = require("./MVC/controllers/Inventory");
 
 express()
   .use(cors())
@@ -63,6 +67,8 @@ express()
 
   .post("/api/inventory", postInventory)
   .post("/api/add-cards", addCards)
+
+  .post("/api/exchange-cards", exchangeCard)
   //////////////////////////////////////////////////////
   .get("*", (req, res) => {
     res.status(404).json({
