@@ -122,11 +122,6 @@ const exchangeCard = async (req, res) => {
         return card;
       }
     });
-    // console.log("1", user1_cards, "username1 : ", findUser1.username);
-    // console.log("2", user2_cards, "username2 : ", findUser2.username);
-    // console.log("*****************************8");
-    // console.log(findUser1.inventory);
-    // console.log("*****************************8");
 
     if (user1_cards.length <= 0 || user2_cards.length <= 0) {
       return res
@@ -182,25 +177,26 @@ const exchangeCard = async (req, res) => {
         // console.log(cardExchanged);
         return userCard.Card.card_id === card;
       });
+
+      console.log("*******************************************");
+      console.log(filteredCards);
+      // console.log(cardExchanged);
+      console.log("*******************************************");
+
+      // console.log(filteredCards.length);
+      if (filteredCards.length > 0) {
+        console.log("THIRD EXECUTED");
+        await Inventory.updateOne(
+          { user_id: findUser1.user_id },
+          { $pullAll: { inventory: filteredCards } }
+        ).catch((err) => {
+          console.log(err);
+        });
+      } else {
+        console.log("Couldn't remove");
+      }
     });
 
-    console.log("*******************************************");
-    console.log(filteredCards);
-    // console.log(cardExchanged);
-    console.log("*******************************************");
-
-    // console.log(filteredCards.length);
-    if (filteredCards.length > 0) {
-      console.log("THIRD EXECUTED");
-      await Inventory.updateOne(
-        { user_id: findUser1.user_id },
-        { $pullAll: { inventory: filteredCards } }
-      ).catch((err) => {
-        console.log(err);
-      });
-    } else {
-      console.log("Couldn't remove");
-    }
     cards_user2.forEach(async (card) => {
       const filteredCards = findUser2.inventory.filter((userCard) => {
         return userCard.Card.card_id === card;
