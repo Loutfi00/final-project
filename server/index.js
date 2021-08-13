@@ -16,14 +16,38 @@ const {
   getToken,
   postToken,
   deleteToken,
+  getAllusers,
+  getUser,
+  getUserInventory,
+  getUserFavorite,
+  getUserExchange,
 } = require("./MVC/controllers/User");
 
 const {
   postInventory,
   addCards,
   exchangeCard,
+  getInventory,
+  addToFavorite,
+  addToExchange,
+  getFavorite,
+  getExchangeable,
 } = require("./MVC/controllers/Inventory");
 
+const {
+  postCard,
+  getAllCards,
+  getOneCard,
+} = require("./MVC/controllers/Cards");
+
+const {
+  postUser1Cards,
+  getExchangeInit,
+  postUser2Cards,
+  confirmTrade,
+  postMessage,
+  getMessages,
+} = require("./MVC/controllers/Trading");
 express()
   .use(cors())
   .use(function (req, res, next) {
@@ -60,15 +84,38 @@ express()
   .post("/api/register", postRegister)
   .get("/api/register", getRegister)
 
-  .get("/api/profile", getProfile)
+  .get("/api/profile/:token", getProfile)
   .post("/api/profile", postPassword)
 
+  .get("/api/profileP/:profileId", getUser)
+  .get("/api/all-users", getAllusers)
   // Inventory stuff
-
   .post("/api/inventory", postInventory)
+  .get("/api/inventory/:token", getInventory)
+
+  .post("/api/cards", postCard)
+  .get("/api/cards", getAllCards)
+  .get("/api/card/:cardId", getOneCard)
+  .get("/api/collection/:id/", getUserInventory)
+
   .post("/api/add-cards", addCards)
+  .post("/api/add-fav", addToFavorite)
+  .post("/api/add-exch", addToExchange)
+
+  .get("/api/favorite/:profileId", getUserFavorite)
+  .get("/api/exchange/:profileId", getUserExchange)
 
   .post("/api/exchange-cards", exchangeCard)
+
+  .post("/api/exchange", postUser1Cards)
+  .get("/api/exchange1", getExchangeInit)
+  .post("/api/exchange2", postUser2Cards)
+
+  .post("/api/confirm-trade", confirmTrade)
+  .get("/api/exchangeable/:token", getExchangeable)
+
+  .post("/api/messages", postMessage)
+  .get("/api/messages/:_id", getMessages)
   //////////////////////////////////////////////////////
   .get("*", (req, res) => {
     res.status(404).json({

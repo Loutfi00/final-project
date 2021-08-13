@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { useHistory } from "react-router-dom";
 import styled from "styled-components";
 import { CgProfile } from "react-icons/cg";
-import background from "../assets/earthbg.jpg";
-import earth from "../assets/earth.jpg";
+import background from "../assets/angel.jpg";
+import castle from "../assets/castle.jpg";
 
 const Login = () => {
   const history = useHistory();
@@ -48,6 +48,7 @@ const Login = () => {
   console.log(error);
 
   localStorage.setItem("token", theData);
+
   return (
     <>
       <Wrapper>
@@ -94,7 +95,6 @@ const Login = () => {
               <Button>Login</Button>
               <Register href="/register">Register</Register>
             </ButtonWrapper>
-            <Group>Group Earth</Group>
           </Left>
           <Right></Right>
         </Form>
@@ -179,7 +179,7 @@ const Right = styled.div`
   height: 100%;
   width: 60%;
   right: 0;
-  background-image: url(${earth});
+  background-image: url(${castle});
   background-size: cover;
   @media only screen and (max-width: 850px) {
     visibility: hidden;
