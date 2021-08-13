@@ -9,6 +9,7 @@ const { JWT_SECRET, JWT_REFRESH_SECRET } = process.env;
 // Login stuff
 const User = require("../models/user");
 const { MONGO_URI } = process.env;
+const Inventory = require("../models/inventory");
 
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
@@ -131,8 +132,21 @@ const postRegister = async (req, res) => {
     throw err;
   }
 };
-const getProfile = (req, res) => {
-  res.status(200).json({ status: 200, message: "test" });
+const getProfile = async (req, res) => {
+  const { token } = req.params;
+  if (token) {
+    try {
+      let user = {};
+      jwt.verify(token, JWT_SECRET, (err, tokenInfo) => {
+        user = tokenInfo;
+      });
+      const _id = user.id;
+      const findUser = await User.findOne({ _id }).lean();
+      res.status(200).json({ status: 200, profile: findUser });
+    } catch (err) {
+      res.sendStatus(403);
+    }
+  }
 };
 const getToken = async (req, res) => {
   const { token } = req.params;
@@ -227,6 +241,77 @@ const getLogout = (req, res) => {
   res.redirect("/");
 };
 
+const getAllusers = async (req, res) => {
+  try {
+    const findUser = await User.find({}).lean();
+    console.log(User);
+    res.status(200).json({ status: 200, data: findUser });
+  } catch (err) {
+    throw err;
+  }
+};
+
+const getUser = async (req, res) => {
+  const { profileId } = req.params;
+  try {
+    const findUser = await User.findOne({ _id: profileId }).lean();
+    res.status(200).json({ status: 200, data: findUser });
+  } catch (err) {
+    throw err;
+  }
+};
+const getUserInventory = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const findUser = await Inventory.findOne({ user_id: id }).lean();
+    res.status(200).json({
+      status: 200,
+      inventory: findUser.inventory,
+      user: findUser,
+    });
+  } catch (err) {
+    console.log(err);
+    res.sendStatus(403);
+  }
+};
+const getUserFavorite = async (req, res) => {
+  const { profileId } = req.params;
+  try {
+    const findUser = await Inventory.findOne({ user_id: profileId }).lean();
+    const errArr = [];
+    console.log(findUser);
+    if (findUser.inventory.length > 0) {
+      const card = findUser.inventory.filter((card) => {
+        return card.card.favorite === true;
+      });
+      res.status(200).json({ status: 200, data: card, user: findUser });
+    } else {
+      res.status(200).json({ status: 200, data: errArr, user: findUser });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(200).json({ status: 200, message: err.msg });
+  }
+};
+const getUserExchange = async (req, res) => {
+  const { profileId } = req.params;
+  try {
+    const findUser = await Inventory.findOne({ user_id: profileId }).lean();
+    const errArr = [];
+    console.log(findUser);
+    if (findUser.inventory.length > 0) {
+      const card = findUser.inventory.filter((card) => {
+        return card.card.exchangeable === true;
+      });
+      res.status(200).json({ status: 200, data: card, user: findUser });
+    } else {
+      res.status(200).json({ status: 200, data: errArr, user: findUser });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(200).json({ status: 200, message: err.msg });
+  }
+};
 module.exports = {
   getLogin,
   getRegister,
@@ -238,4 +323,9 @@ module.exports = {
   getToken,
   postToken,
   deleteToken,
+  getAllusers,
+  getUser,
+  getUserInventory,
+  getUserFavorite,
+  getUserExchange,
 };

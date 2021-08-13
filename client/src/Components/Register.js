@@ -2,14 +2,15 @@ import { useHistory } from "react-router-dom";
 import React, { useState } from "react";
 import styled from "styled-components";
 import { CgProfile } from "react-icons/cg";
-import background from "../assets/earthbg.jpg";
-import earth from "../assets/earth.jpg";
+import background from "../assets/castle.jpg";
+import earth from "../assets/angel.jpg";
 
 const Register = () => {
   const history = useHistory();
   const [passObj, setPassObj] = useState({});
   const [error, setError] = useState(null);
-  const handleSubmit = (e) => {
+  const [id, setId] = useState("");
+  const handleSubmit = async (e) => {
     e.preventDefault();
     let form = document.forms.registerForm.elements;
     let fullForm = {};
@@ -23,8 +24,7 @@ const Register = () => {
       password: fullForm.password,
       confirmPassword: fullForm.confirmPassword,
     });
-
-    fetch("http://localhost:4000/api/register", {
+    await fetch("http://localhost:4000/api/register", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -37,17 +37,33 @@ const Register = () => {
         return res.json();
       })
       .then((data) => {
-        console.log(data);
         setError(data.errCode);
         // history.push("/login");
         if (data.errCode === 0) {
+          fetch("http://localhost:4000/api/inventory", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              _id: data.message._id,
+            }),
+          })
+            .then((res) => {
+              return res.json();
+            })
+            .then((data) => {
+              console.log(data);
+            });
           history.push("/login");
         }
         console.log(error);
       });
+    console.log(id);
   };
   console.log(error);
   console.log(passObj);
+  console.log(id);
   const errorHandler = (errCode) => {
     if (errCode === 0) {
       return "Success";
